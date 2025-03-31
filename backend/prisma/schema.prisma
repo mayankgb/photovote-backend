@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(uuid())
+  name        String?
+  role        Role
+  email       String?       @unique
+  password    String?
+  image       String?
+  age         Int?
+  contest     Contest[]
+  participant Participant[]
+  instituteId String?
+  institute   Institute?    @relation(fields: [instituteId], references: [id])
+  vote        Vote[]
+  branchId    String?
+  branch      Branch?       @relation(fields: [branchId], references: [id])
+  Gender      Category?
+  winner      Winner[]
+}
+
+model Institute {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  city     String
+  state    String
+  country  String
+  imageUrl String?
+  user     User[]
+  contest  Contest[]
+  branch   Branch[]
+}
+
+model Branch {
+  id         String    @id @default(uuid())
+  name       String    @unique
+  instiuteId String
+  instiute   Institute @relation(fields: [instiuteId], references: [id])
+  user       User[]
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  USER
+}
+
+model Contest {
+  id          String        @id @default(uuid())
+  name        String
+  adminId     String
+  admin       User          @relation(fields: [adminId], references: [id])
+  instituteId String
+  institute   Institute     @relation(fields: [instituteId], references: [id])
+  participant Participant[]
+  category    Category
+  vote        Vote[]
+  endDate     DateTime
+  startDate   DateTime      @default(now())
+  status      ContestStatus @default(CREATED)
+  winner      Winner?
+}
+
+model Participant {
+  id        String         @id @default(uuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  contestId String
+  contest   Contest        @relation(fields: [contestId], references: [id])
+  upvote    Int            @default(0)
+  vote      Vote[]
+  status    ApprovalStatus
+
+  @@unique([contestId, userId])
+}
+
+model Vote {
+  id            String      @id @default(uuid())
+  contestId     String
+  contest       Contest     @relation(fields: [contestId], references: [id])
+  voterId       String
+  voter         User        @relation(fields: [voterId], references: [id])
+  participantId String
+  participant   Participant @relation(fields: [participantId], references: [id])
+
+  @@unique([voterId, contestId])
+}
+
+model Winner {
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  contestId String  @unique
+  contest   Contest @relation(fields: [contestId], references: [id])
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVE
+  CANCELLED
+}
+
+enum Category {
+  MALE
+  FEMALE
+  SUGAR_DADDY
+}
+
+enum ContestStatus {
+  CREATED
+  STARTED
+  ENDED
+}

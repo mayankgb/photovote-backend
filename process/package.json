@@ -1,0 +1,22 @@
+{
+  "name": "process",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc -b && node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "dotenv": "^16.4.7",
+    "ioredis": "^5.6.0",
+    "prisma": "^6.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14"
+  }
+}
