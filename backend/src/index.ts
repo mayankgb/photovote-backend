@@ -17,6 +17,12 @@ app.use(express.json())
 app.use("/user", userRouter)
 app.use("/admin", adminRouter)
 
+app.get("/ping", async (req , res) => {
+    res.status(200).json({
+        message:"working"
+    })
+})
+
 
 async function main() {
     try {
