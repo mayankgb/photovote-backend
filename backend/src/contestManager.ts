@@ -216,7 +216,7 @@ export class ContestManager {
         try {
             const data = await this.prisma.contest.findMany({
                 where: {
-                    status: "CREATED",
+                    status: "STARTED",
                 },
                 select: {
                     id: true,
