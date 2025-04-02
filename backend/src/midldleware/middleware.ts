@@ -2,7 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken"
 
 export function middleware(req: Request, res: Response, next: NextFunction) {
-    const token = req.headers.authorization
+
+    try {
+        const token = req.headers.authorization
     if(!token) {
         res.status(403).json({
             message: 'Unauthorised Access'
@@ -17,6 +19,13 @@ export function middleware(req: Request, res: Response, next: NextFunction) {
     next()
     
     return
+    }catch(e) {
+        console.log("this is the middleware", e)
+        res.status(403).json({
+            message:"somthing went wrong"
+        })
+        return
+    }
 }
 
 export function adminMiddleware(req: Request, res: Response, next: NextFunction) {
