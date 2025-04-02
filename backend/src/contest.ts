@@ -63,17 +63,57 @@ export class Contest {
         }
 
         this.participant[participantIndex].upvote += 1
+        
         this.votedPerson.set(voterId, participantId)
         this.participant.sort((a, b) => b.upvote - a.upvote)
 
-        this.userWs.forEach((ws) => {
-            ws.send(JSON.stringify({
-                data: this.participant.slice(0,10),
-                status: 200,
-                type: "data"
-            }))
-        })
+        const updatedParticipantIndex = this.participant.findIndex((a) => a.id === participantId)
 
+        if (participantIndex > 9 && updatedParticipantIndex <= 9) {
+            const exisitingParticipant = this.participant[updatedParticipantIndex]
+            
+            if (updatedParticipantIndex === 9) {
+                this.userWs.forEach((ws) => {
+                    ws.send(JSON.stringify({
+                        type:"Last",
+                        data: exisitingParticipant,
+                        status: 200
+                    }))
+                })
+                return {
+                    message: "new",
+                    status: 200
+                }
+            }else {
+                this.userWs.forEach((ws) => {
+                    ws.send(JSON.stringify({
+                        type: "new",
+                        data:exisitingParticipant,
+                        index: updatedParticipantIndex,
+                        status: 200
+                    }))
+                })
+                return{
+                    message: "new",
+                    status: 200
+                }
+            }
+        }else if (participantIndex <=9 ) {
+            this.userWs.forEach((ws) => {
+                ws.send(JSON.stringify({
+                    type: "update",
+                    data: this.participant[updatedParticipantIndex],
+                    index: updatedParticipantIndex,
+                    status: 200
+                }))
+            })
+        }else {
+            return {
+                message: "successfully voted",
+                data: this.participant,
+                status: 200
+            }
+        }
         return {
             message: "successfully voted",
             data: this.participant,
@@ -118,5 +158,11 @@ export class Contest {
         }
     }
 
+    getWinner() {
+        return {
+            message: this.participant[0].id,
+            status: 200
+        }
+    }
 
 }

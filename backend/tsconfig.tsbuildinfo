@@ -1,1 +1,1 @@
-{"root":["./src/contest.ts","./src/contestmanager.ts","./src/createcontest.ts","./src/index.ts","./src/ping.ts","./src/script.ts","./src/midldleware/middleware.ts","./src/routes/admin.ts","./src/routes/user.ts","./src/types/types.ts"],"version":"5.8.2"}
+{"root":["./src/contest.ts","./src/contestmanager.ts","./src/createcontest.ts","./src/index.ts","./src/script.ts","./src/midldleware/middleware.ts","./src/routes/admin.ts","./src/routes/user.ts","./src/types/types.ts"],"version":"5.8.2"}

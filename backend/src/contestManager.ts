@@ -28,6 +28,8 @@ export class ContestManager {
             db: 0,
             port:15025
         })
+
+        // this.redis = new Redis()
         this.streamName = "molest"
         this.contestRoom = new Map()
         this.instituteRoom = new Map()
@@ -46,11 +48,15 @@ export class ContestManager {
         const contestIndex = this.instituteRoom.get(instituteId)?.findIndex((v) => v === contestId)
         if (contestIndex && contestIndex != -1) {
             this.instituteRoom.get(instituteId)?.splice(contestIndex, 1)
+            return {
+                message: "contest ended",
+                status: 200
+            }
         }
-        return {
-            message: "contest ended",
-            status: 200
-        }
+       return {
+        message: "something went wrong",
+        status: 500
+       }
     }
 
     getAllParticipant(instituteId: string, contestId: string, userId: string) {
@@ -104,6 +110,12 @@ export class ContestManager {
                     }
                 }
                 const response = contest.upvote(voterId, participantId)
+                if (!response) {
+                    return {
+                        message: "something went wrong",
+                        status: 400
+                    }
+                }
                 if (response.status > 200) {
                     return {
                         message: response.message,
@@ -195,22 +207,102 @@ export class ContestManager {
         }
     }
 
-    endContestId(adminId: string, contestId: string, instituteId: string) {
-        const isAdmin = this.contestRoom.get(contestId)?.adminId === adminId
-        if (isAdmin) {
-            this.contestRoom.get(contestId)?.endContest(contestId, instituteId)
+    // endContestId(adminId: string, contestId: string, instituteId: string) {
+    //     const isAdmin = this.contestRoom.get(contestId)?.adminId === adminId
+    //     if (isAdmin) {
+    //         this.contestRoom.get(contestId)?.endContest(contestId, instituteId)
+    //         return {
+    //             message: "successfully ended",
+    //             status: 200
+    //         }
+    //     }
+    //     return {
+    //         message: "unauthorised access",
+    //         status: 403
+    //     }
+    // }
+
+   async endContestId(adminId: string, contestId: string, instituteId: string) {
+
+        try{
+            if (!this.contestRoom.has(contestId)) {
+                return{
+                    message: "bad request",
+                    status: 400
+                }
+            }
+    
+            const isAdmin = this.contestRoom.get(contestId)?.adminId === adminId
+    
+            if (!isAdmin) {
+                return {
+                    message:"unauthorise access",
+                    status: 401
+                }
+            }
+    
+            const winnerId = this.contestRoom.get(contestId)?.getWinner()
+            if (!winnerId) {
+                return {
+                    message: "something went wrong",
+                    status: 400
+                }
+            }
+
+            this.contestRoom.delete(contestId)
+            this.instituteRoom.get(instituteId)?.filter((v) => v !== contestId)
+
+            if (this.instituteRoom.get(instituteId)?.length === 0) {
+                this.instituteRoom.delete(instituteId)
+            }
+
+            const data = await this.prisma.$transaction(async (tx) => {
+                await tx.contest.update({
+                    where: {
+                        id: contestId,
+                        adminId: adminId,
+                        instituteId: instituteId,
+                        status: "STARTED"
+                    },
+                    data:{
+                        status: "ENDED"
+                    }
+                })
+
+               const id =  await tx.winner.create({
+                    data: {
+                        userId: winnerId.message,
+                        contestId: contestId
+                    },
+                    select :{
+                        id: true
+                    }
+                })
+
+                return id.id
+            })
+
+            if (data) {
+                return {
+                    message: contestId,
+                    status: 200
+                }
+            }
+
             return {
-                message: "successfully ended",
-                status: 200
+                message: "something went wrong",
+                status: 400
+            }
+
+            
+        }catch(e) {
+            console.log(e)
+            return{
+                message: "something up with the server",
+                status: 400
             }
         }
-        return {
-            message: "unauthorised access",
-            status: 403
-        }
     }
-
-
 
     async getData() {
         try {
@@ -313,6 +405,122 @@ export class ContestManager {
             throw new Error(JSON.stringify(e))
 
 
+        }
+    }
+
+
+    async startContest(contestId: string , adminId: string, instituteId: string) {
+        try{
+
+            if (this.instituteRoom.has(instituteId)) {
+               const index =  this.instituteRoom.get(instituteId)?.findIndex((a) => a === contestId)
+                if(index && index > 0) {
+                    return{
+                        message: "you already in the queue sir",
+                        status: 400
+                    }
+                }
+            }else {
+                this.instituteRoom.set(instituteId, [contestId])
+            }
+
+            const data = await this.prisma.$transaction(async (tx) => {
+                
+                const response = await tx.contest.findFirst({
+                    where: {
+                        id: contestId,
+                        adminId: adminId,
+                        instituteId: instituteId,
+                        status: "CREATED"
+                    },
+                    select: {
+                        id: true,
+                        name: true, 
+                        instituteId: true,
+                        adminId: true,
+                        participant: {
+                            where: {
+                                status: "APPROVE"
+                            },
+                            select:{
+                                id: true,
+                                upvote: true,
+                                user: {
+                                    select:{
+                                        name:true,
+                                        id: true,
+                                        image: true,
+                                        branch: {
+                                            select: {
+                                                name: true
+                                            }
+                                        }
+                                    }
+                                }
+    
+                            }
+                        }
+                    }
+                })
+
+               await tx.contest.update({
+                    where: {
+                        id: contestId,
+                        adminId: adminId,
+                        instituteId: instituteId,
+                        status: "CREATED"
+                    },
+                    data: {
+                        status: "STARTED"
+                    }
+                })
+                return response
+            })
+
+
+            if (data) {
+                const newContest = new Contest(data.id, data.name, data.instituteId ,this.endContest.bind(this), data.adminId)
+
+                data.participant.map((d) => {
+                    const newParticipant: Participant = {
+                        id: d.id,
+                        upvote: d.upvote,
+                        user: {
+                            id:d.user.id,
+                            name:d.user.name,
+                            image: d.user.image,
+                            branch: {
+                                name: d.user.branch ? d.user.branch.name : ""
+                            }
+                            
+                        }
+                    }
+                    newContest.addUser(newParticipant)
+                })
+
+                console.log(data)
+
+                this.contestRoom.set(contestId, newContest)
+
+                return{
+                    message: newContest.id,
+                    status: 200
+                }
+            }
+
+            this.instituteRoom.get(instituteId)?.filter((a) => a !== contestId)
+            return {
+                message: "something went wrong",
+                status: 403
+            }
+
+        }catch(e) {
+            console.log(e)
+            this.instituteRoom.get(instituteId)?.filter((a) => a !== contestId)
+            return{
+                message: "something went wrong",
+                status: 500
+            }
         }
     }
 

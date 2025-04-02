@@ -31,7 +31,6 @@ userRouter.post("/upvote", middleware, async (req , res) => {
     res.status(response.status).json({
         message: response.message,
         isVoted: true,
-        data: response.data
     })
     return
 

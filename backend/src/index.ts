@@ -47,7 +47,7 @@ async function main() {
                             }))
                            return 
                         }
-                        const token = jwt.verify(data.token, "addasd") as { id: string, instituteId: string }
+                        const token = jwt.verify(data.token, process.env.JWT_SECRET || "sec3rt") as { id: string, instituteId: string }
                         ws.userId = token.id
                         ws.instituteId = token.instituteId
 
