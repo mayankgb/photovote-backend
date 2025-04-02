@@ -2,6 +2,9 @@ import { Router } from "express";
 import { middleware } from "../midldleware/middleware";
 import { ContestManager } from "../contestManager";
 import { endContestSchema, upvoteSchema } from "../types/types";
+import dotenv from "dotenv"
+
+dotenv.config()
 
 
 export const userRouter = Router()

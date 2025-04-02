@@ -1,17 +1,23 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+
+dotenv.config()
 
 export function middleware(req: Request, res: Response, next: NextFunction) {
 
     try {
         const token = req.headers.authorization
+        console.log("this is the frontendtoken",token)
     if(!token) {
         res.status(403).json({
             message: 'Unauthorised Access'
         })
         return
     }
-    const decode = jwt.verify(token, process.env.JWT_SECRET || "addasd") as {id : string , instituteId: string}
+    const decode = jwt.verify(token, process.env.JWT_SECRET! ) as {id : string , instituteId: string}
+    console.log("this is the jwt secret",process.env.JWT_SECRET)
+    console.log("this is the middleware",decode)
 
     res.locals.userId = decode.id
     res.locals.instituteId = decode.instituteId

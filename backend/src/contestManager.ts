@@ -2,6 +2,9 @@ import { PrismaClient } from "@prisma/client"
 import Redis from "ioredis"
 import { Contest } from "./contest"
 import { CustomWebsocket, Participant } from "./types/types"
+import dotenv from "dotenv"
+
+dotenv.config()
 
 type contestId = string
 

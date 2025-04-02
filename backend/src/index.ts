@@ -7,6 +7,9 @@ import jwt from "jsonwebtoken"
 import { ContestManager } from "./contestManager"
 import { userRouter } from "./routes/user"
 import { adminRouter } from "./routes/admin"
+import dotenv from "dotenv"
+
+dotenv.config()
 
 const app = express()
 
@@ -47,8 +50,11 @@ async function main() {
                             }))
                            return 
                         }
-                        const token = jwt.verify(data.token, process.env.JWT_SECRET || "sec3rt") as { id: string, instituteId: string }
+                        console.log("this is the data of websocket" ,data)
+                        console.log(process.env.JWT_SECRET)
+                        const token = jwt.verify(data.token, process.env.JWT_SECRET!) as { id: string, instituteId: string }
                         ws.userId = token.id
+                        console.log("this is the webscoket token",token)
                         ws.instituteId = token.instituteId
 
                         if (!token.id || !token.instituteId) {
@@ -60,6 +66,7 @@ async function main() {
                         }
 
                         const response = ContestManager.getInstance().firstOnline(ws ,data.contestId)
+                        return
                     }
                 } catch (e) {
                     console.log(e)
