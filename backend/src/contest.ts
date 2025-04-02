@@ -85,6 +85,7 @@ export class Contest {
                     status: 200
                 }
             }else {
+                console.log(exisitingParticipant)
                 this.userWs.forEach((ws) => {
                     ws.send(JSON.stringify({
                         type: "new",
@@ -99,6 +100,8 @@ export class Contest {
                 }
             }
         }else if (participantIndex <=9 ) {
+            console.log(updatedParticipantIndex)
+            console.log(this.participant[updatedParticipantIndex])
             this.userWs.forEach((ws) => {
                 ws.send(JSON.stringify({
                     type: "update",
