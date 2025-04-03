@@ -30,11 +30,12 @@ app.get("/ping", async (req , res) => {
 async function main() {
     try {
 
-        await ContestManager.getInstance().getData()
         const port = 8001
         const server = app.listen(port)
         const wss = new WebSocketServer({ server: server })
 
+        await ContestManager.getInstance().getData()
+        
         wss.on("connection", function connection(ws: CustomWebsocket) {
             ws.on("error", (e) => console.log(e))
 
