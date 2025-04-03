@@ -82,6 +82,7 @@ model Participant {
   contest   Contest        @relation(fields: [contestId], references: [id])
   upvote    Int            @default(0)
   vote      Vote[]
+  winner    Winner?
   status    ApprovalStatus
 
   @@unique([contestId, userId])
@@ -100,11 +101,13 @@ model Vote {
 }
 
 model Winner {
-  id        String  @id @default(uuid())
-  userId    String
-  user      User    @relation(fields: [userId], references: [id])
-  contestId String  @unique
-  contest   Contest @relation(fields: [contestId], references: [id])
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  participantId String      @unique
+  participant   Participant @relation(fields: [participantId], references: [id])
+  contestId     String      @unique
+  contest       Contest     @relation(fields: [contestId], references: [id])
 }
 
 enum ApprovalStatus {

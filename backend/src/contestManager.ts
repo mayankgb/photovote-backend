@@ -225,7 +225,7 @@ export class ContestManager {
     //     }
     // }
 
-   async endContestId(adminId: string, contestId: string, instituteId: string) {
+   async endContestId(adminId: string, contestId: string, instituteId: string , role: string) {
 
         try{
             if (!this.contestRoom.has(contestId)) {
@@ -237,7 +237,7 @@ export class ContestManager {
     
             const isAdmin = this.contestRoom.get(contestId)?.adminId === adminId
     
-            if (!isAdmin) {
+            if (!isAdmin && !(role === "OWNER")) {
                 return {
                     message:"unauthorise access",
                     status: 401
@@ -274,7 +274,8 @@ export class ContestManager {
 
                const id =  await tx.winner.create({
                     data: {
-                        userId: winnerId.message,
+                        userId: winnerId.participant.user.id,
+                        participantId: winnerId.participant.id,
                         contestId: contestId
                     },
                     select :{
@@ -425,6 +426,24 @@ export class ContestManager {
                 }
             }else {
                 this.instituteRoom.set(instituteId, [contestId])
+            }
+
+            const isParticipant = await this.prisma.contest.findFirst({
+                where: {
+                    id: contestId, 
+                    adminId: adminId,
+                    status: "CREATED"
+                },
+                select:{
+                    _count: { select: { participant: { where: {status: "APPROVE"}}}}
+                }
+            })
+
+            if (isParticipant?._count.participant === 0) {
+                return {
+                    message: "no participant present in this contest so you are not able to start it",
+                    status: 400
+                }
             }
 
             const data = await this.prisma.$transaction(async (tx) => {

@@ -22,8 +22,9 @@ adminRouter.post("/endcontest", adminMiddleware, async (req, res) => {
 
         const userId = res.locals.userId
         const instituteId = res.locals.instituteId
+        const role = res.locals.role
 
-        const response = await ContestManager.getInstance().endContestId(userId, parsedBody.data.contestId, instituteId)
+        const response = await ContestManager.getInstance().endContestId(userId, parsedBody.data.contestId, instituteId, role)
 
         if (response.status > 200) {
             res.status(response.status).json({

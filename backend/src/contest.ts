@@ -163,7 +163,7 @@ export class Contest {
 
     getWinner() {
         return {
-            message: this.participant[0].id,
+            participant: this.participant[0],
             status: 200
         }
     }
