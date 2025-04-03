@@ -19,6 +19,13 @@ export interface Participant {
     }
 }
 
+export interface Position {
+    rank: number,
+    userId: string,
+    participantId: string,
+    contestId: string
+}
+
 export const upvoteSchema = z.object({
     contestId: z.string({message: "invalid inputs"}).min(1),
     participantId: z.string({message: "invalid type"}).min(1, {message: "id should not be empty"})

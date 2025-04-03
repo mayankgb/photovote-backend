@@ -1,8 +1,7 @@
-import { CustomWebsocket, Participant } from "./types/types"
+import { CustomWebsocket, Participant, Position } from "./types/types"
 
 type participantId = string
 type voterId = string
-
 
 export class Contest {
     id: string
@@ -13,6 +12,7 @@ export class Contest {
     adminId: string
     endContest: (contestId: string , instituteId: string) => {message: string, status: number}
     instituteId: string
+    isEnded: boolean
 
     constructor(id: string, contestName: string,institueId: string, removeContest: (contestId: string, instituteId: string) => {message: string, status: number}, adminId: string)  {
         this.id = id
@@ -23,6 +23,7 @@ export class Contest {
         this.endContest = removeContest
         this.adminId = adminId
         this.instituteId = institueId
+        this.isEnded = false
     }
 
     addUser(participant: Participant) {
@@ -46,6 +47,12 @@ export class Contest {
     }
 
     upvote(voterId: string, participantId: string) {
+        if (this.isEnded) {
+            return {
+                message: "contest is ended",
+                status: 400
+            }
+        }
         if (this.votedPerson.has(voterId)) {
             return {
                 message: "you already voted",
@@ -162,8 +169,20 @@ export class Contest {
     }
 
     getWinner() {
+        this.isEnded = true
+
+        const positions: Position[] = this.participant.map((user,index) => {
+            const newParticipant: Position = {
+                rank: index + 1,
+                userId: user.user.id,
+                participantId: user.id,
+                contestId: this.id,
+            }
+            return newParticipant
+        })
+
         return {
-            participant: this.participant[0],
+            participant: positions,
             status: 200
         }
     }

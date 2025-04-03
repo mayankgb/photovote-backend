@@ -29,7 +29,7 @@ model User {
   branchId    String?
   branch      Branch?       @relation(fields: [branchId], references: [id])
   Gender      Category?
-  winner      Winner[]
+  position      Position[]
 }
 
 model Institute {
@@ -71,7 +71,7 @@ model Contest {
   endDate     DateTime
   startDate   DateTime      @default(now())
   status      ContestStatus @default(CREATED)
-  winner      Winner?
+  position      Position?
 }
 
 model Participant {
@@ -82,7 +82,7 @@ model Participant {
   contest   Contest        @relation(fields: [contestId], references: [id])
   upvote    Int            @default(0)
   vote      Vote[]
-  winner    Winner?
+  position    Position?
   status    ApprovalStatus
 
   @@unique([contestId, userId])
@@ -100,8 +100,9 @@ model Vote {
   @@unique([voterId, contestId])
 }
 
-model Winner {
+model Position {
   id            String      @id @default(uuid())
+  rank          Int
   userId        String
   user          User        @relation(fields: [userId], references: [id])
   participantId String      @unique

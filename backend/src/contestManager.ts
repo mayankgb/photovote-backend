@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client"
 import Redis from "ioredis"
 import { Contest } from "./contest"
-import { CustomWebsocket, Participant } from "./types/types"
+import { CustomWebsocket, Participant, Position } from "./types/types"
 import dotenv from "dotenv"
 
 dotenv.config()
@@ -244,8 +244,8 @@ export class ContestManager {
                 }
             }
     
-            const winnerId = this.contestRoom.get(contestId)?.getWinner()
-            if (!winnerId) {
+            const participantPosition = this.contestRoom.get(contestId)?.getWinner()
+            if (!participantPosition) {
                 return {
                     message: "something went wrong",
                     status: 400
@@ -258,7 +258,6 @@ export class ContestManager {
             if (this.instituteRoom.get(instituteId)?.length === 0) {
                 this.instituteRoom.delete(instituteId)
             }
-
             const data = await this.prisma.$transaction(async (tx) => {
                 await tx.contest.update({
                     where: {
@@ -272,18 +271,10 @@ export class ContestManager {
                     }
                 })
 
-               const id =  await tx.winner.create({
-                    data: {
-                        userId: winnerId.participant.user.id,
-                        participantId: winnerId.participant.id,
-                        contestId: contestId
-                    },
-                    select :{
-                        id: true
-                    }
+               const id =  await tx.position.createMany({
+                    data: participantPosition.participant,
                 })
-
-                return id.id
+                return contestId
             })
 
             if (data) {
@@ -546,4 +537,31 @@ export class ContestManager {
         }
     }
 
+    async sendLeaderBoardToDb(leaderBoard: Position[]) {
+
+        try{
+
+            const response = await this.redis.xadd(
+                this.streamName,
+                "*",
+                "leaderBoard", JSON.stringify(leaderBoard),
+                "type", "leaderboard"
+            )
+
+            return {
+                message: "ended",
+                status: 200
+            }
+
+
+        }catch(e) {
+            console.log(e)
+            return{
+                message:"something went wrong",
+                status: 500
+            }
+        }
+
+    }
+ 
 }
