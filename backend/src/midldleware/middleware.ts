@@ -69,3 +69,28 @@ export function adminMiddleware(req: Request, res: Response, next: NextFunction)
         return
     }
 }
+
+export async function cronMiddleware(req: Request, res: Response, next:NextFunction) {
+
+    try{
+
+        const secret = req.headers.authorization
+
+        if (!secret || !(process.env.CRON_SECRET === secret)) {
+            res.status(401).json({
+                message: "unauthorisd access"
+            })
+            return
+        }
+
+        next()
+        return
+
+    }catch(e){
+        console.log(e)
+        res.status(500).json({
+            message: "something went wrong"
+        })
+        return 
+    }
+}

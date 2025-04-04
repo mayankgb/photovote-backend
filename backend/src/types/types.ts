@@ -34,3 +34,9 @@ export const upvoteSchema = z.object({
 export const endContestSchema = z.object({
     contestId: z.string({message: "invalid input type"}).min(1, {message: "contestId should not be empty"})
 })
+
+export const cronSchema = z.object({
+    contestId: z.string().min(1),
+    adminId: z.string().min(1),
+    instituteId: z.string().min(1)
+})

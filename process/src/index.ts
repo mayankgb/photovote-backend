@@ -14,10 +14,6 @@ async function main() {
         port: 15025,
         db:0
     })
-
-    "S1l7yqw7p40zft47trqwe9vbu14nls3q5jobeg8lxlj9bsgiqq6"
-    "Mayank Agarwal"
-
     const streamName = "molest"
     const groupName = "molestmessage"
     const consumerName = "consumer1"

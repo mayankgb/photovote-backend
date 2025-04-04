@@ -8,6 +8,7 @@ import { ContestManager } from "./contestManager"
 import { userRouter } from "./routes/user"
 import { adminRouter } from "./routes/admin"
 import dotenv from "dotenv"
+import { cronRouter } from "./routes/cron"
 
 dotenv.config()
 
@@ -26,6 +27,7 @@ app.get("/ping", async (req , res) => {
     })
 })
 
+app.use("/cron", cronRouter)
 
 async function main() {
     try {
