@@ -10,10 +10,10 @@ const prisma = new PrismaClient()
 
 const s3 = new S3Client({
     credentials: {
-        accessKeyId: "AKIAQ3EGT6CUTMT25HPC",
-        secretAccessKey:"uD4r4MCrkhbMwowMq//yZsCKsnbWje5gPF+iXdN7"
+        accessKeyId: "add your key",
+        secretAccessKey:"add your secret access key"
     },
-    region: "us-east-1"
+    region: "add your region"
   });
 
 
