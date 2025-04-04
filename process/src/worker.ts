@@ -59,7 +59,8 @@ async function processUnacknowledgedMessages(): Promise<void> {
 }
 
 async function handleTask(data: Record<string, string>): Promise<void> {
-    await upvote(data.participantId, data.contestId, data.voterId)
+   const voterId = await upvote(data.participantId, data.contestId, data.voterId)
+   console.log(voterId)
   return new Promise((resolve) => setTimeout(resolve, 500));
 }
 
@@ -77,12 +78,17 @@ async function upvote(participantId: string, contestId: string, voterId: string)
             }
         })
 
-        await tx.vote.create({
+       const voter = await tx.vote.create({
             data: {
                 contestId: contestId,
                 voterId: voterId,
                 participantId: participantId
+            },
+            select: {
+                id: true
             }
         })
+        return voter.id
     })
+    return updateUser
 }

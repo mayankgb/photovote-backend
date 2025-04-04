@@ -51,7 +51,7 @@ async function main() {
                     console.log(data)
                     const response = await upvote(data.participantId, data.contestId, data.voterId)
                     await redis.xack(streamName, groupName, messageId)
-
+                    console.log(response)
                 } catch (e) {
                     console.log(e)
                 }
@@ -81,12 +81,17 @@ async function upvote(participantId: string, contestId: string, voterId: string)
             }
         })
 
-        await tx.vote.create({
+        const voter = await tx.vote.create({
             data: {
                 contestId: contestId,
                 voterId: voterId,
                 participantId: participantId
+            },
+            select: {
+                id: true
             }
         })
+        return voter.id
     })
+    return updateUser
 }
