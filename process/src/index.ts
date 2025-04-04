@@ -24,8 +24,6 @@ async function main() {
 
     async function setupStreamAndGroup() {
         try {
-            // const groups = await redis.xinfo('GROUPS', streamName)
-            // console.log(groups)
             await redis.xgroup('CREATE', streamName, groupName, '$', 'MKSTREAM');
         } catch (err) {
             console.log(err)
