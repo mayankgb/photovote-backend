@@ -66,6 +66,7 @@ async function main() {
                                 message: "invalid token",
                                 status: 401
                             }))
+                            return
                         }
 
                         const response = ContestManager.getInstance().firstOnline(ws ,data.contestId)

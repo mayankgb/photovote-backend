@@ -17,6 +17,7 @@ export function middleware(req: Request, res: Response, next: NextFunction) {
     }
     console.log("this is the jwt secret",process.env.JWT_SECRET)
     const decode = jwt.verify(token, process.env.JWT_SECRET! ) as {id : string , instituteId: string}
+    console.log(decode)
    
     console.log("this is the middleware",decode)
 

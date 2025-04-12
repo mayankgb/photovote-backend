@@ -71,7 +71,7 @@ model Contest {
   endDate     DateTime
   startDate   DateTime      @default(now())
   status      ContestStatus @default(CREATED)
-  position      Position?
+  position      Position[]
 }
 
 model Participant {
@@ -107,8 +107,10 @@ model Position {
   user          User        @relation(fields: [userId], references: [id])
   participantId String      @unique
   participant   Participant @relation(fields: [participantId], references: [id])
-  contestId     String      @unique
+  contestId     String      
   contest       Contest     @relation(fields: [contestId], references: [id])
+
+  @@unique([participantId,contestId])
 }
 
 enum ApprovalStatus {
