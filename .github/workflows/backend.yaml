@@ -1,7 +1,7 @@
 name: Backend deployment 
 on: 
     push: 
-        branches: ["main"]
+        branches: ["master"]
 jobs: 
     Deploy:
         runs-on: ubuntu-latest
