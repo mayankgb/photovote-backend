@@ -19,7 +19,7 @@ jobs:
                     git pull
                     cd backend
                     npm install
-                    pm2 restart backend
+                    pm2 restart photovote-backend
                 
 
                 
