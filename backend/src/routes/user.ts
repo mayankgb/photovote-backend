@@ -78,5 +78,10 @@ userRouter.post("/getallparticipant", middleware, async (req, res) =>  {
 
 })
 
-
-
+userRouter.get("/test", async(req , res) => { 
+    console.log("everthing is working")
+    res.json({
+        message: "everything is working fine"
+    })
+    return
+})

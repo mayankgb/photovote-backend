@@ -6,6 +6,9 @@ jobs:
     Deploy:
         runs-on: ubuntu-latest
         steps: 
+           - name: directory structure
+             run: | 
+                ls
            - name: ssh into the server and deploy the code
              uses:  appleboy/ssh-action@v1
              with: 
