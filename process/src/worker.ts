@@ -8,7 +8,7 @@ const redis = new Redis({
     host: process.env.REDIS_ENDPOINT ,
     username: "default",
     password: process.env.REDIS_PASSWORD,
-    port: 15025,
+    port: 11774,
     db:0
 });
 const prisma = new PrismaClient()

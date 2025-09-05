@@ -1,18 +1,14 @@
-name: Backend deployment 
+name: Photovote-process-deployment
 on: 
     push: 
         branches: ["master"]
-        paths: ["backend/**"]
+        paths: ["process/**"]
 
 jobs: 
     Deploy:
         runs-on: ubuntu-latest
         steps: 
-           - name: directory structure
-             run: | 
-                ls
-                pwd 
-           - name: ssh into the server and deploy the code
+           - name: ssh into the server deploy process service
              uses:  appleboy/ssh-action@v1
              with: 
                 host: ${{ secrets.HOST }}
@@ -22,10 +18,9 @@ jobs:
                 script: | 
                     ls
                     cd photovote-backend
+                    cd process
                     git pull
-                    cd backend
                     npm install
-                    pm2 restart photovote-backend
-                
-
-                
+                    npm run build
+                    pm2 restart photovote-listener
+                    pm2 restart photovote-worker

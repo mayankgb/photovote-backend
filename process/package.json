@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc -b && node dist/index.js"
+    "build": "tsc -b",
+    "start:listener": "tsc -b && node dist/index.js",
+    "start:worker": "tsc -b && node dist/worker.js"
   },
   "keywords": [],
   "author": "",
