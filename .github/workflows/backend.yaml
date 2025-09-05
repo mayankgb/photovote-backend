@@ -1,0 +1,25 @@
+name: Backend deployment 
+on: 
+    push: 
+        branches: ["master"]
+jobs: 
+    Deploy:
+        runs-on: ubuntu-latest
+        steps: 
+           - name: ssh into the server and deploy the code
+             uses:  appleboy/ssh-action@v1
+             with: 
+                host: ${{ secrets.HOST }}
+                username: root
+                key: ${{ secrets.SSH_SECRETS }}
+                port: 22
+                script: | 
+                    ls
+                    cd photovote-backend
+                    git pull
+                    cd backend
+                    npm install
+                    pm2 restart backend
+                
+
+                

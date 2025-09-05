@@ -95,12 +95,3 @@ async function main() {
 
 
 main()
-
-
-
-
-// const redis = new Redis()
-// async function main() {
-//     await redis.xadd("molest", "*", "data", "as" )
-// }
-// main()
