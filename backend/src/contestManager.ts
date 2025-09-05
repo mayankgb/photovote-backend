@@ -29,8 +29,10 @@ export class ContestManager {
             username: "default",
             password: process.env.REDIS_PASSWORD,
             db: 0,
-            port:15025
+            port:11774
         })
+
+        console.log("redis is working", this.redis)
 
         // this.redis = new Redis()
         this.streamName = "molest"
